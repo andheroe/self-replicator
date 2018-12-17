@@ -35,7 +35,7 @@ def index():
     response = github.post("/user/repos", json.dumps(payload))
 
     repo = Repo.clone_from(origin_repo.json()['clone_url'], tmp + '/' + new_repo_name)
-    remote = repo.create_remote('target',response.json()['clone_url'])
+    remote = repo.create_remote('target',response.json()['git_url'])
     remote.push(refspec='{}:{}'.format('master','master'))
 
-    return redirect(response.json()['svn_url'])
+    return redirect(response.json()['url'])
