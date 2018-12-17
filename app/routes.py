@@ -4,7 +4,7 @@ from werkzeug.contrib.fixers import ProxyFix
 from flask_dance.contrib.github import make_github_blueprint, github
 import git
 from git import Repo
-from config import basedir
+from config import tmp
 
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
@@ -34,7 +34,7 @@ def index():
     payload = {'name': new_repo_name, 'description': origin_repo.json()['description']}
     response = github.post("/user/repos", json.dumps(payload))
 
-    repo = Repo.clone_from(origin_repo.json()['clone_url'], basedir + new_repo_name)
+    repo = Repo.clone_from(origin_repo.json()['clone_url'], tmp + '/' + new_repo_name)
     remote = repo.create_remote('target',response.json()['clone_url'])
     remote.push(refspec='{}:{}'.format('master','master'))
 
