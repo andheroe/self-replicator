@@ -5,6 +5,7 @@ from flask_dance.contrib.github import make_github_blueprint, github
 import git
 from git import Repo
 from config import tmp
+import shutil
 
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
@@ -35,7 +36,8 @@ def index():
     response = github.post("/user/repos", json.dumps(payload))
 
     repo = Repo.clone_from(origin_repo.json()['clone_url'], tmp + '/' + new_repo_name)
-    remote = repo.create_remote('target',response.json()['git_url'])
+    remote = repo.create_remote('target', response.json()['clone_url'][:8] + github.token['access_token'] + ':' + 'x-oauth-basic@' + response.json()['clone_url'][8:])
     remote.push(refspec='{}:{}'.format('master','master'))
+    shutil.rmtree(tmp + '/' + new_repo_name)
 
-    return redirect(response.json()['url'])
+    return redirect(response.json()['svn_url'])
